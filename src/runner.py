@@ -2,13 +2,13 @@ import os
 from github import Github
 from src.graph import build_graph
 from src.github_client import get_pr_diff, get_pr_comments
-from src.rag import initialize_vector_db
+from src.rag import get_retriever
 
 # Initialize DB once when the module loads (or verify it exists)
 # This keeps the app "warm"
 if not os.path.exists("./chroma_db"):
     print("🚀 Initializing Vector DB...")
-    initialize_vector_db("./adrs")
+    get_retriever("./adrs")
 
 def run_review_task(repo_name: str, pr_number: int):
     """

@@ -170,14 +170,25 @@ def tool_executor(state: GraphState):
     return {"file_content_cache": current_cache}
 
 # --- Node 5: Senior Filter ---
+# src/nodes.py
+
 def senior_filter_agent(state: GraphState):
     print("--- Filtering Review ---")
-    critique = state["initial_critique"]
     
-    # Extract text content if it's an object
+    # --- FIX START: Bypass filter if we are in Chat Mode ---
+    if state.get("conversation_history"):
+        print("   ↳ Chat Mode detected: Skipping strict filtering.")
+        # Pass the chat reply directly to the publisher
+        critique = state["initial_critique"]
+        if hasattr(critique, 'content'): 
+            critique = critique.content
+        return {"final_comment": critique}
+    # --- FIX END ---
+
+    critique = state["initial_critique"]
     if isinstance(critique, AIMessage):
         critique = critique.content
-        
+
     prompt = ChatPromptTemplate.from_template(
         """You are a Principal Engineer. Review the initial critique.
         
